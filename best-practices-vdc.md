@@ -13,28 +13,31 @@
    ms.topic="article"
    ms.tgt_pltfrm="na"
    ms.workload="na"
-   ms.date="05/01/2016"
-   ms.author="jonor;thuyle;telmos;roshar" />
+   ms.date="11/25/2016"
+   ms.author="jonor;fabferri;telmos" />
 
 #Microsoft Azure Virtual Data Center
 **Microsoft Azure**: Move faster, Save money, Integrate on-premises apps and data
+
 ##Overview
-Migrating on-premises applications to Azure, even without significant changes (an approach known as “lift and shift”), provides organizations the benefits of a secured and cost-efficient infrastructure. However, to make the most of agility possible with cloud computing, enterprise will have to evolve their architectures to take advantage of the Azure capabilities. Microsoft Azure delivers hyper-scale services and infrastructure, enterprise-grade capabilities, and many choices for hybrid connectivity. Customers can choose to access these services either via the Internet or with Azure ExpressRoute, which provides private network connectivity. The Microsoft Azure platform allows customers to seamlessly extend their infrastructure into the cloud and build multi-tier architectures. Additionally, third parties can enable enhanced capabilities by offering security services and virtual appliances. This article provides an overview of patterns and designs that can be used to solve the architectural scale, performance, and security concerns many customers face off when thinking about moving en masse to the cloud.
-An overview of how to fit the different IT roles in the organization to the management and governance of the system is discussed, taking always in mind security requirements and cost optimization.
+Migrating on-premises applications to Azure, even without significant changes (an approach known as “lift and shift”), provides organizations the benefits of a secured and cost-efficient infrastructure. However, to make the most of the agility possible with cloud computing, enterprises should evolve their architectures to take advantage of Azure capabilities. Microsoft Azure delivers hyper-scale services and infrastructure, enterprise-grade capabilities, and many choices for hybrid connectivity. Customers can choose to access these services either via the Internet or with Azure ExpressRoute, which provides private network connectivity. The Microsoft Azure platform allows customers to seamlessly extend their infrastructure into the cloud and build multi-tier architectures. Additionally, non-Microsoft partners provide enhanced capabilities by offering security services and virtual appliances that are optimized to run in Azure. This article provides an overview of patterns and designs that can be used to solve the architectural scale, performance, and security concerns many customers face when thinking about moving en masse to the cloud.
+
+An overview of how to fit the different IT roles in the organization to the management and governance of the system is also discussed, always keeping in mind security requirements and cost optimization.
 
 ##What is a Virtual Data Center?
-In the early days of public clouds, clouds were designed for small development teams to get single applications, in relative isolation, into the public cloud. This worked well for a few years, but as the benefits of putting workloads into the cloud became apparent, bigger scale (and the problems come with it) needed to be solved.
+In the early days of public clouds, clouds were designed for small development teams to get single applications, in relative isolation, into the public cloud. This worked well for a few years, but as the benefits of putting workloads into the cloud became apparent, bigger scale (and the problems that come with it) needed to be solved. Problems such as redundant equipment across workloads, or missing devices making workloads out of compliance with corporate standards as shown in the diagram below.
 
-		fig1: duplication of the DC components 
+[![0]][0]
 
-It was the necessity of scale from which the Virtual Data Center (vDC) was born. 
+It was the necessity of scale from which the Virtual Data Center (vDC) was born.
 
-The inspiration of this paper is to provide an architectural patterns and advice on how a vDC can be designed to be secure, reliable, high scalable, and cost efficient.
-A vDC is not just the application workloads in the cloud, but also the network, security, management, and infrastructure (for example, DNS and Directory Services) and usually a private connection back to an on-premise network or data center. As more and more workloads move to Azure it's beneficial to think about the supporting infrastructural and containing objects that these workloads are placed in to avoid hundreds of "workload islands" that must be managed separately with independent data flow, security models, and compliance challenges.
+The inspiration of this paper is to provide architectural patterns and advice on how a vDC can be designed to be secure, reliable, highly scalable, and cost efficient.
 
-By viewing your workloads as an integrated Virtual Data Center, that is to say separate but related entities with common supporting functions, features, and infrastructure; you can realize reduced cost due to economy of scale, optimized security through component and data flow centralization, and easier management and compliance audits.
+A vDC is not just the application workloads in the cloud, but also the network, security, management, and infrastructure (for example, DNS and Directory Services) and usually a private connection back to an on-premise network or data center. As more and more workloads move to Azure it is beneficial to think about the supporting infrastructure and containing objects that these workloads are placed in to avoid hundreds of "workload islands" that must be managed separately with independent data flow, security models, and compliance challenges.
 
->[AZURE.NOTE] It's important to understand that the vDC is NOT a discreet Azure product, but the combination of various features and capabilities to meet your exact requirements. vDC is a way of thinking about your workloads and Azure usage to maximize your resources and abilities in the cloud. Azure DC is therefore a modular approach on how to build up IT services in the Azure, respecting company roles and responsibilities.
+By viewing your workloads as an integrated Virtual Data Center, that is to say separate but related entities with common supporting functions, features, and infrastructure; you can realize reduced cost due to economies of scale, optimized security through component and data flow centralization, and easier operations, management, and compliance audits.
+
+>[AZURE.NOTE] It's important to understand that the vDC is **NOT** a discreet Azure product, but the combination of various features and capabilities to meet your exact requirements. vDC is a way of thinking about your workloads and Azure usage to maximize your resources and abilities in the cloud. The virtual DC is therefore a modular approach on how to build up IT services in the Azure, respecting company roles and responsibilities.
  
 The vDC can help enterprises get workloads and applications into Azure for the following scenarios:
 
@@ -43,18 +46,17 @@ The vDC can help enterprises get workloads and applications into Azure for the f
  - Implementing shared or centralized security and access requirements across workloads
  - Mixing DevOps and Centralized IT appropriately for a large enterprise
 
-As it will be discussed more in the detail in the article, the key that allows to unlock the vDC is the centralized topology (hub and spokes) with a mix of Azure features: Azure VNet, NSG, UDR, VNet peering, Azure Identity (with Role Base Access Control and policy).
+As it will be discussed more in this and subsequent articles; the key that unlocks the vDC is a centralized topology (hub and spokes) with a mix of Azure features: Azure VNet, NSG, UDR, VNet peering, and Azure Identity (with Role Base Access Control and policy).
 
 ##Who Needs a Virtual Data Center?
 Any Azure customer that needs to move in excess of two to three workloads into Azure can benefit from thinking about common resources to be utilized. Given sufficient size, even single applications can benefit from using the patterns and components used to build a vDC.
 
-If your organization has a centralized IT, Security, and/or Compliance team/department, a vDC can help enforce policy points, segregation of duty, and ensure uniformity of the underlying common components while giving the application teams as much freedom and control as is appropriate for your requirements.
-Centralized IT is really an advantage for your deployment in Azure where you have multiple workloads; instead to threat with multiple workloads, treat the mess with holistic.
+If your organization has a centralized IT, Network, Security, and/or Compliance team/department, a vDC can help enforce policy points, segregation of duty, and ensure uniformity of the underlying common components while giving the application teams as much freedom and control as is appropriate for your requirements.
 
-Organizations that are looking to DevOps can utilize the vDC concepts to provide authorized pockets of Azure resources and ensure they have total control within group, but that the network and security boundaries stay compliant as defined by a centralized policy.
+Organizations that are looking to DevOps can utilize the vDC concepts to provide authorized pockets of Azure resources and ensure they have total control within that group (either subscription or resource group in a common subscription), but the network and security boundaries stay compliant as defined by a centralized policy in a hub VNet and Resource Group.
 
 ##Considerations on Implementing a Virtual Data Center
-Let's discuss now some  aspects related to the governance of the vDC. There some pivotal aspects need to considered to create a vDC:
+There some pivotal aspects to considered when designing a vDC:
 
  - Identity
  - Security
@@ -62,8 +64,13 @@ Let's discuss now some  aspects related to the governance of the vDC. There some
  - Connectivity to the cloud
  - Connectivity within the cloud
 
-Identity is a key aspect of large DCs, where complexity requires a cooperation between different company teams and roles to get the system running with good governance.
-Identity and access to Azure resources is controlled by Azure subscription, Azure Active Directory (Azure AD) and Role-Based Access Control (RBAC).
+Identity is a key aspect of a data center. Generally, working in a data center requires cooperation between different company teams and roles to enable the systems to run optimally with good governance.
+
+Identity and access for controlling Azure resources within an Azure subscription is done using Azure Active Directory (Azure AD) and Role-Based Access Control (RBAC).
+
+**<-- Should this Selection be in a next level down document and removed from this high level doc? -->**
+**<-- Begin Selection -->**
+
 An Azure subscription grants you access to all Azure resources. An Azure subscription has two aspects:
 
 - The Azure account, through which resource usage is reported and services are billed.
@@ -137,18 +144,21 @@ Using policies, it is possible to address some scenario of the vDC:
 
 see [https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/](https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/ "Use Policy to manage resources and control access")
 
+**<-- End Selection -->**
+**<-- This section started with a bulleted list, we only talked about Identity, we should talk about the other items in the list at a very very high level -->**
 
 ##Virtual Data Center Overview
 ###Topology
 A vDC is deployed in Azure region and it is based on hub and spokes architecture.
 
-		fig5: vDC topology
+[![1]][1]
 
-The hub is central zone to control/inspect all the traffic in ingress/egress between different zones: internet, on-premises and the spokes. The hub and spokes topology give to the central IT department an effective way to enforce the security policies in central location, reducing potential misconfiguration and exposure.
-In the hub resides the common service components required for the function level of the spokes. Here few typical examples of common central services: 
+The hub is a central zone to control and inspect the ingress and/or egress traffic in between different zones: internet, on-premises and the spokes. The hub and spokes topology give the central IT department an effective way to enforce security policies in central location while reducing the potential for misconfiguration and exposure.
+
+In the hub reside the common service components required by the spokes. Here few typical examples of common central services: 
 
 - the Windows Active Directory infrastructure (with the related ADFS service) required for user authentication of third parties accessing from untrusted networks before getting access to the workloads in the spoke, 
-- a DNS service to resolve naming for the workload in the spokes, to access to specific resource on-premises and to internet.
+- a DNS service to resolve naming for the workload in the spokes, to access to specific resource on-premises and to internet
 - a PKI infrastructure, to implement a single sign-on on workloads
 - a flow control (TCP/UDP) between the spokes and Internet
 - a flow control between the spoke and on-premises
@@ -381,7 +391,8 @@ Most of LOBs in production require service with high SLA to have the minim impac
 
 
 <!--Image References-->
-[0]: ./media/best-practices-network-security/Flowchart1.png "Security Options Flowchart"
+[0]: ./media/best-practice-vdc/redundant-equipment.png "Example of component overlap"
+[1]: ./media/best-practice-vdc/vdc-high-level.png "High level example of hub and spoke vDC"
 
 <!--Link References-->
 [Example1]: ./virtual-network/Network-Boundary-DMZ-NSG-ASM1.md
