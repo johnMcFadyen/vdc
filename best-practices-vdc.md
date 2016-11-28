@@ -19,7 +19,7 @@
 #Microsoft Azure Virtual Data Center
 **Microsoft Azure**: Move faster, Save money, Integrate on-premises apps and data
 
-##Overview
+##Overview 
 Migrating on-premises applications to Azure, even without significant changes (an approach known as “lift and shift”), provides organizations the benefits of a secured and cost-efficient infrastructure. However, to make the most of the agility possible with cloud computing, enterprises should evolve their architectures to take advantage of Azure capabilities. Microsoft Azure delivers hyper-scale services and infrastructure, enterprise-grade capabilities, and many choices for hybrid connectivity. Customers can choose to access these services either via the Internet or with Azure ExpressRoute, which provides private network connectivity. The Microsoft Azure platform allows customers to seamlessly extend their infrastructure into the cloud and build multi-tier architectures. Additionally, non-Microsoft partners provide enhanced capabilities by offering security services and virtual appliances that are optimized to run in Azure. This article provides an overview of patterns and designs that can be used to solve the architectural scale, performance, and security concerns many customers face when thinking about moving en masse to the cloud.
 
 An overview of how to fit the different IT roles in the organization to the management and governance of the system is also discussed, always keeping in mind security requirements and cost optimization.
