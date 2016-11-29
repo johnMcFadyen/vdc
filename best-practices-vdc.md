@@ -68,84 +68,10 @@ Identity is a key aspect of a data center. Generally, working in a data center r
 
 Identity and access for controlling Azure resources within an Azure subscription is done using Azure Active Directory (Azure AD) and Role-Based Access Control (RBAC).
 
-**<-- Should this Selection be in a next level down document and removed from this high level doc? -->**
-**<-- Begin Selection -->**
+The Azure AD is a multi tenant cloud service to manage directory and identity (an Azure AD stores **users**, **groups** and **services principle**).
+A single administrator does not allow to get the work done in a vDC.
+Enterprises need to give to a specific department (group of users or services), the exact permissions they need. Too many permissions exposes an account to attackers, but too few permissions means that employees can't get their work done efficiently. Azure Role-Based Access Control (RBAC) helps to address this problem, by offering fine-grained access management to Azure resources. 
 
-An Azure subscription grants you access to all Azure resources. An Azure subscription has two aspects:
-
-- The Azure account, through which resource usage is reported and services are billed.
-- The subscription itself, which governs access to and use of the Azure services that are subscribed to. The subscription holder (account owner) manages services through the Azure platform.
-
-An Azure subscription grants access to the Azure resource, but it does not define who can access (authentication) to the resource and by which rights (authorization).
-The Azure AD is a multi tenant cloud service to manage directory and identity [https://azure.microsoft.com/en-us/documentation/articles/active-directory-whatis/](https://azure.microsoft.com/en-us/documentation/articles/active-directory-whatis/ "What is Azure Active Directory")
-The Azure subscription (using Azure Management portal or Azure Resource Manager API), before get access to the resources, needs to authenticate with that Azure AD.
-Every Azure subscription has a trust relationship with an Azure AD tenant. This means that it trusts that directory to authenticate users, services, and devices. Multiple subscriptions can trust the same directory, but a subscription trusts only one directory.
-[https://azure.microsoft.com/en-us/documentation/articles/active-directory-how-subscriptions-associated-directory/](https://azure.microsoft.com/en-us/documentation/articles/active-directory-how-subscriptions-associated-directory/ "How an Azure subscription is related to Azure AD")
-
-		fig.2: multiple Azure subscriptions with single AAD tenant  
-
-In Azure Resource Manager all the Azure resources respect a hierarchy:
-
-- Each subscription in Azure belongs to only one Azure AD.
-- Each resource group belongs to only one Azure subscription.
-- Each resource belongs to only one resource group.
- 
-When an Azure subscription is created a Service Administrator (SA) is associate with the subscription; this role is authorized to manage all Azure services available in the Azure subscription. A single administrator does not allow to get the work done in a vDC.
-Enterprises need to give to a specific department (group of users), the exact permissions they need. Too many permissions exposes an account to attackers, but too few permissions means that employees can't get their work done efficiently. Azure Role-Based Access Control (RBAC) helps to address this problem, by offering fine-grained access management for resources in Azure subscription.
-Azure RBAC allows you to grant appropriate access to Azure AD **users**, **groups**, and **services**, by assigning roles to them on a subscription or resource group or individual resource level. The assigned role defines the level of access that the users, groups, or services have on the Azure resource. A role is a collection of actions that can be performed on Azure resources. A user or a service is allowed to perform an action on an Azure resource if they have been assigned a role that contains that action.
-[https://azure.microsoft.com/en-gb/documentation/articles/role-based-access-control-what-is/](https://azure.microsoft.com/en-gb/documentation/articles/role-based-access-control-what-is/ "Basics of access management in Azure")
-
-		fig3: RBAC
-
-Azure RBAC comes with built-in roles (that you can't modify) that can be assigned to users, groups, and services. 
-see [https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/](https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/ "RBAC: Built-in roles")
-
-There are three special build-in roles: 
-
-- **Owner**: This role has full control over Azure resources. Owner can perform all management operations on a resource including access management. 
-- **Contributor**: This role can perform all management operations except access management. So, a contributor can’t grant access to others.
-- **Reader**: This role can only view resources. Reader can’t view secrets associated with a resource. 
-
-As it will discussed further, Contributor and Reader are two main roles to control the access to the resources of the vDC. The are two expects need to be considered in usage of RBAC in vDC:
-
-- access granted at parent scopes is inherited at child scopes.
-- usage of build-in security roles is the preferred approach to simplify the management
-
-		Fig. 4: RBAC scope
-
-If none of the built-in roles meet your specific access needs, RBAC offers the possibility to use custom roles. Custom roles are stored in an Azure AD tenant and can be shared across all subscriptions that use that tenant as the Azure AD directory for the subscription.
-see [https://azure.microsoft.com/en-us/documentation/articles/role-based-access-control-custom-roles/](https://azure.microsoft.com/en-us/documentation/articles/role-based-access-control-custom-roles/ "Custom Roles in Azure RBAC")
-This is particular pertinent for vDC, where custom roles can be in some cases stored in different AD tenants.
-  
-A custom role is a collection of **Actions**, **NotActions** and **AssignableScopes** properties:
-
-- **Actions**: it specifies the Azure operations to which the role grants access. It is a collection of operation strings that identify operations on the Azure resource providers. 
-- **NotActions**: it sets of operations that you wish to exclude. The access granted by a custom role is computed by subtracting the **NotActions** operations from the **Actions** operations.
-- The **AssignableScopes**: it specifies the scopes (subscriptions, resource groups, or specific resources) within which the custom role is available for assignment. You can make the custom role available for assignment in only the subscriptions or resource groups that require it, or an Azure Resource Provider.
-
-Roles can be assigned to the following types of Azure AD objects:
-
-- **Users**: roles can be assigned to organizational users that are in the Azure AD with which the Azure subscription is associated.
-- **Groups**: roles can be assigned to Azure AD security groups. A user is automatically granted access to a resource if the user becomes a member of a group that has access. The user also automatically loses access to the resource after getting removed from the group.. Managing access via groups by assigning roles to groups and adding users to those groups is the best practice, instead of assigning roles directly to users. The ability to assign roles to groups lets an organization extend its existing access control model from its on-premises directory to the cloud, so security groups that are already established to control access on-premises can be re-used to control access to resources. For more information about different options for synchronizing users and groups from an on-premises directory, see [https://azure.microsoft.com/en-gb/documentation/articles/active-directory-aadconnect/](https://azure.microsoft.com/en-gb/documentation/articles/active-directory-aadconnect/ "Integrating your on-premises identities with Azure Active Directory")
-- **Service principle**: it is normally used to authenticate process. 
-
-Roles can also be assigned for resource groups as well as for individual resources. 
-So if a user, group, or service is granted access to only a resource group within a subscription, they will be able to access only that resource group and resources within it, and not the other resources groups within the subscription. As another example, a security group can be added to the Reader role for a resource group, but be added to the Contributor role for a network within that resource group.
-
-Azure Resource Manager allows also to control access through custom policies. With policies, you can prevent users in your organization from breaking conventions that are needed to manage your organization's resources.
-You create policy definitions that describe the actions or resources that are specifically denied. As in RBAC you assign those policy definitions at the desired scope, such as the subscription, resource group, or an individual resource. Policies are inherited by all child resources. So, if a policy is applied to a resource group, it is applicable to all the resources in that resource group.
-Policies and RBAC work together; to use policies, you must be authenticated through RBAC. Unlike RBAC, policy is a default allow and explicit deny system. 
-Using policies, it is possible to address some scenario of the vDC:
-
-- *billing requirement*: one common scenario is to require departmental tags for billing purpose. An organization might want to allow operations only when the appropriate cost center is associated; otherwise, they deny the request. This policy helps them charge the appropriate cost center for the operations performed.
-- *control on Azure region*: An organization might want to control the locations where resources are created. 
-- *restrict SKUs*: you might want to restrict the deployment to VMs and/or storage account to specific types.
-- *enforce naming convention*. it will be useful to impose a name convention on Azure resources.
-
-see [https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/](https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/ "Use Policy to manage resources and control access")
-
-**<-- End Selection -->**
-**<-- This section started with a bulleted list, we only talked about Identity, we should talk about the other items in the list at a very very high level -->**
 
 ##Virtual Data Center Overview
 ###Topology
@@ -172,11 +98,11 @@ The hub deployment is bound to a specific Azure subscription that have some rest
 
 		fig6: cluster of hub-spokes
 
-Introduction of multiple hubs determines an increment of cost and management effort justified only in the case of presence of high  number of spokes. In the vDC the total cost of hub should be marginal compare with the cost of hub, to avoid to come back to the approach described at beginning for the paper with duplication of components in Azure.
+Introduction of multiple hubs determines cost increment and management effort justified only in the case of presence of high  number of spokes. In the vDC the total cost of hub should be marginal compare with the cost of hub, to avoid to come back to the approach described at beginning for the paper with duplication of components in Azure.
 It is interesting to debate some interconnection cases:
 
-- **interconnection between hubs.** The vDC model is based on hub containing all the common services, requested to the spokes and in principle there is no benefit to interconnect hubs.
-- **interconnection between spokes** (belonging to the same hub or different hubs). Inside a single spoke is possible to implement complex multi-tiers workloads. Multi-tier configurations can be implemented using subnets (one for every tier) in the same VNet and filtering the flows by NSGs. A typical example is the case where multiple application servers deployed (under the responsibility of developer team) are in a spoke while the  database is deployed in a different spoke. In this case it is easy interconnect the spokes to avoid transit in the hub.
+- **interconnection between hubs.** The vDC model is based on hub containing all the common services, requested to the spokes. Two hub should offer the same set of services and for functional prospective, there is no effective benefit to interconnect hubs.
+- **interconnection between spokes** (residents in the same hub or different hubs). Inside a single spoke is possible to implement complex multi-tiers workloads. Multi-tier configurations can be implemented using subnets (one for every tier) in the same VNet and filtering the flows by NSGs. A typical example is the case where multiple application servers deployed (under the responsibility of developer team) are in a spoke while the  database is deployed in a different spoke. In this case it is easy interconnect the spokes to avoid transit in the hub.
 
 		fig.7: spoke-to-spoke
 
@@ -252,12 +178,12 @@ Usage of NAT on the on-premises edge routers (or in Azure), to avoid IP address 
 
 Let's describe briefly the different components included in the infrastructure. 
 
-- **Identity and directory services**. Access to every resource type  in Azure is controlled by identity stored in directory service. the directory service store not only the list of users but also the right to access to a resources in a specific Azure subscription. The identity can live only in the cloud or can be synchronized with on-premises identity in Active Directory structure.
-- **Virtual Network**. Virtual Network is the main feature of the infrastructure composed by a single or multiple segments, each with a specific IP network prefix.  
-Virtual Network is mandatory component of the vDC.
-- **UDR**. A custom routing table is a list of routes  a provide a set of routing rule to overwrite the system table behaviour. An UDR can be applied to a subnet. If UDR is an optional component in some specific scenario, it becomes a must to have in the vDC, to guarantee that egress traffics from the spoke transit through Network Virtual Appliances present in the hub.
-- **NSG**. In Azure the traffic control is nativity implemented through Network Security Group (NSG). A Network Security Group is a list of security rules that act as filtering; each rule is based on a tuple of 5 values: IP Source, IP Destination, Protocol, IP Source Port and IP Destination port. One powerful expect of NSG that the filtering mechanism is stateful: when a rule is created to allow to establish the flow, the flow related to the answer is automatically accepted. This property of NSG hep to reduce the list of entries in the security policy. The NSG can be applied to a subnet or a Virtual NIC card of an Azure VM. To have an agile management of security policies in vDC is recommended to make leverage of NSGs applied to subnets: this avoid a proliferation of NSGs with possibility to reuse the same NSG for different deployments (dev and test, UART, pre-production and production). In principle NSGs are not a mandatory component, but become essential to implement a correct flows control in the vDC.
-- **DNS**. DNS is mandatory component present in all infrastructures, on-premises and in the cloud. If not specified the VNet uses an default Azure DNS (assigned automatically from Network Resource Provider) to resolve naming inside the VNets. The default DNS associate to the VNets normally doesn't satisfy with customer requirements. In most of cases a custom DNS service is part of common services in the hub. The main consumers of DNS reside in the spoke. For example a two tiers application with a web front and a SQL server in backed might requires of SQL server resolution by ALIAS.
+- **Identity and directory services**. Access to every resource type  in Azure is controlled by identity stored in directory service. The directory service store not only the list of users but also the right to access to a resources in a specific Azure subscription. The identity can live only in the cloud or can be synchronized with on-premises identity in Active Directory structure.
+- **Virtual Network**. Virtual Network is the main components of the infrastructure composed by a single or multiple segments, each with a specific IP network prefix.  
+Virtual Network is mandatory component of the vDC. Virtual Network define a internal perimenter area where virtual machine and PaaS services can establish a private communication.  
+- **UDR**. User Define Route is a custom routing table the the network administrator can associate to one or more subnets to overwrite the behaviour of system table behaviour. If UDR is an optional component in some specific scenarios, it becomes a must to have in the vDC. The presence of UDRs guarantee that egress traffics from the spoke transit through Network Virtual Appliances present in the hub.
+- **NSG**. In Azure the TCP/UDP flows control is nativity implemented through Network Security Group (NSG). A Network Security Group is a list of security rules that act as filtering; each rule is based on a tuple of 5 values: IP Source, IP Destination, Protocol, IP Source Port and IP Destination port. One powerful expect of NSG that the filtering mechanism is stateful: when a rule is created to allow to establish the flow, the flow related to the answer is automatically accepted. This property of NSG hep to reduce the list of entries in the security policy. The NSG can be applied to a subnet or a Virtual NIC card of an Azure VM or both. To have an agile management of security policies in vDC is recommended to make leverage of NSGs applied to subnets: this avoid a proliferation of NSGs with possibility to reuse the same NSG for different deployments (dev and test, UART, pre-production and production). In principle NSGs are not a mandatory component, but become essential to implement a correct flows control in the vDC.
+- **DNS**. DNS is mandatory component present in all infrastructures, on-premises and in the cloud. If not specified, the VNet uses an default Azure DNS (assigned automatically from Network Resource Provider) to resolve naming inside the VNets. The default DNS associate to the VNets normally doesn't satisfy with customer requirements. In most of cases a custom DNS service is part of common services in the hub. The main consumers of DNS reside in the spoke. For example a two tiers application with a web front and a SQL server in backed might requires of SQL server resolution by ALIAS.
 - **Subscription and Resource Group Management**. A subscription defines a natural boundary to create multiple type of resources in Azure. A Resource Group is a logical container inside a subscription, that define a set of mix resources. The nature of Resource Group is pure administrative and does not influence how the different components, defined in it, are assembled together. The Resource Group has therefore a pure administrative nature and need to be used in vDC to reflect the logical partition of multiple resources and rights. When a Resource Group are deleted all the associated resource will be removed.
 - **RBAC**. As described previously in the article, the RBAC is crucial point of the vDC architecture, to map company role with rights to access to the Azure resources. 
 
