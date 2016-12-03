@@ -64,22 +64,35 @@ There some pivotal aspects to considered when designing a vDC:
  - Connectivity to the cloud
  - Connectivity within the cloud
 
-Identity is a key aspect of a data center. Generally, working in a data center requires cooperation between different company teams and roles to enable the systems to run optimally with good governance.
-
-Identity and access for controlling Azure resources within an Azure subscription is done using Azure Active Directory (Azure AD) and Role-Based Access Control (RBAC).
-
-The Azure AD is a multi tenant cloud service to manage directory and identity (an Azure AD stores **users**, **groups** and **services principle**).
+Identity is a key aspect of every data center on-premises and in the cloud. Any large enterprise needs to define an identity management process that describes the management of individual identities, their authentication, authorization, roles and privileges within or across the vDC with the goals of increase security and productivity while decreasing cost, downtime, and repetitive manual tasks.
+Following an approach top-down enterprise business create a demanding of services for the different LOBs, and employees  with different company roles are involved with different responsibility in deployments and maintenance of LOBs services. 
+A vDC requires therefore a cooperation between different teams, each with specific role, to get the systems running with good governance. the matrix of responsibility due and access rights can be extremely complex.  The VDC is able to address this complexity by different mechanisms and features. Identity management in Azure resources is implemented through Azure Active Directory (Azure AD) and Role-Based Access Control (RBAC).
+The Azure AD is a multi tenant cloud service to manage directory services and identity (an Azure AD stores **users**, **groups** and **services principle**).
 A single administrator does not allow to get the work done in a vDC.
 Enterprises need to give to a specific department (group of users or services), the exact permissions they need. Too many permissions exposes an account to attackers, but too few permissions means that employees can't get their work done efficiently. Azure Role-Based Access Control (RBAC) helps to address this problem, by offering fine-grained access management to Azure resources. 
 
+The vDC is not an isolated island and needs of a connectivity with external networks to offer IT services to customers, partners and/or internal users (private LOBs applications).
+Azure datacenters provide connectivity to internet; customers can build their security polities to control what and how specific vDC services of the different LOBs are accessible to/from internet by Network Virtual Appliances (with filtering and traffic inspection), custom routing policy and Network Security Groups in the vDC.
+Enterprise need to operate with vDC as in local DC; the connectivity between Azure the  on-premises networks is therefore a crucial aspect to build an effective architecture.
+Enterprise have two different ways to create interconnection between vDc and on-premises: transit over internet or/and by private connections.
+Let's discuss briefly the different connectivity to Azure DCs.
+**Azure Site-to-Site VPN**  can be used to create a hybrid solution, or whenever you want  secure encrypted connections tunnels (IPsec/IKE), between your on-premises networks and the vDC with transit in internet. Azure Site-to-Site connection is extremely flexible and have fast deployment time (do not require any procurement effort to order network circuits, because connection transit is in internet). 
+Azure Site-to-Site VPN can be deployed in multi-sites configuration: customer can create and configure multiple VPN connection between the vDC and multiple on-premises networks. The configuration is extremely useful in all cases where customer do not have an internal private network to reach out the branch offices and want to connect them to the vDC.
+**ExpressRoute** is an Azure connectivity service that lets you create **private connections** between vDC and the on-premises networks. ExpressRoute connections do not go over the public Internet, and offer higher security, reliability and speeds with lower latencies than typical connections over the Internet. ExpressRoute is a **must** to have of every large vDC, due to the benefit of integration with on-premises networks and the satisfaction of most restrictive rules of security of compliance, associated with private connections.
+The deployment of ExpressRoute connection requires an agreement with ExpressRoute service provider and it is typically longer process than Site-to-site VPN. For customer that need to start quickly with lift-and-shift approach, it is quite common to make leverage on Site-to-site VPN to ram up fast and review the setup later, when the ExpressRoute will be completed successful.
+ExpressRoute  connection and Azure Site-to-site VPN are not mutually exclusive, but they can coexist. Having the ability to configure Site-to-Site VPN and ExpressRoute has several advantages. You can configure Site-to-Site VPN as a secure failover path for ExpressRoute, or use Site-to-Site VPNs to connect to sites that are not connected through ExpressRoute.
+[https://docs.microsoft.com/en-us/azure/expressroute/expressroute-howto-coexist-resource-manager](https://docs.microsoft.com/en-us/azure/expressroute/expressroute-howto-coexist-resource-manager "Configure ExpressRoute and Site-to-Site coexisting connections")
+Few customers are used to configure Azure Site-to-Site VPN for management purpose to reach out the deployments in vDC with different path of ExpressRoute connection. The coexistence Site-to-site VPN and ExpressRoute is not a must of vDC architecture, but only an add value.
+
+  
 
 ##Virtual Data Center Overview
 ###Topology
-A vDC is deployed in Azure region and it is based on hub and spokes architecture.
+A vDC is deployed in single Azure region and it is based on hub and spokes architecture.
 
 [![1]][1]
 
-The hub is a central zone to control and inspect the ingress and/or egress traffic in between different zones: internet, on-premises and the spokes. The hub and spokes topology give the central IT department an effective way to enforce security policies in central location while reducing the potential for misconfiguration and exposure.
+The hub is a central zone for the control and inspection of the ingress and/or egress traffic between different zones: internet, on-premises and the spokes. The hub and spokes topology give the central IT department an effective way to enforce security policies in central location while reducing the potential for misconfiguration and exposure.
 
 In the hub reside the common service components required by the spokes. Here few typical examples of common central services: 
 
@@ -91,26 +104,25 @@ In the hub reside the common service components required by the spokes. Here few
 - in some seldom case, the traffic control between spoke and spoke.
 
 Compare with traditional approach to the DC, the vDC reduce the overall cost through the multiple utilization of shared hub infrastructure between different spokes.
-The role of the spokes is to host the different type of workloads. The spokes provide a modular approach of repeatable deployments (e.g. dev and test, UAT, pre-production and production) of the same workloads. Inside a spoke is possible to deploy a basic workload or a complex multi-tier workload with traffic control between tiers.
+The role of the spokes is to host the different type of workloads. The spokes provide a modular approach of repeatable deployments (e.g. dev and test, UAT, pre-production and production) of the same workloads. Inside a spoke is possible to deploy a basic workload or a complex multi-tier workloads with traffic control between tiers.
+In Azure every virtual component (doesn't matter which type is) is deployed in a specific Azure Subscription. The Azure subscription define therefore a natural mandatory boundary to deploy all Azure components (Virtual Networks, custom routing tables-UDR, Network Security Rules, Storage accounts, IaaS and PaaS services, etc.). The property of isolation of Azure components belonging to different Azure subscriptions can be used to satisfy the requirements of different LOBs, setting up the right level of access and authorization. 
 
-A single vDc can scale up easily to large number of spokes; nevertheless as every IT system the the system can reach out a limit present in the platform.
+
+A single vDC can scale up easily to large number of spokes; nevertheless as every IT system the the system can reach out a limit present in the platform.
 The hub deployment is bound to a specific Azure subscription that have some restrictions and maximum values (e.g. max number of VNet peering-see [https://azure.microsoft.com/en-us/documentation/articles/azure-subscription-service-limits/](https://azure.microsoft.com/en-us/documentation/articles/azure-subscription-service-limits/ "Azure subscription and service limits")); in these circumstances the architecture is still capable to scale up, extending the model by a cluster of hub and spokes, in the same Azure region.
 
-		fig6: cluster of hub-spokes
+[![2]][2]
 
-Introduction of multiple hubs determines cost increment and management effort justified only in the case of presence of high  number of spokes. In the vDC the total cost of hub should be marginal compare with the cost of hub, to avoid to come back to the approach described at beginning for the paper with duplication of components in Azure.
+Introduction of multiple hubs determines cost increment and management effort justified only in the case of presence of high  number of spokes. In the vDC the total cost of hub should be marginal compare with the cost of hub, to avoid to come back to the approach described at beginning of the paper with duplication of components in Azure.
 It is interesting to debate some interconnection cases:
 
-- **interconnection between hubs.** The vDC model is based on hub containing all the common services, requested to the spokes. Two hub should offer the same set of services and for functional prospective, there is no effective benefit to interconnect hubs.
+- **interconnection between hubs.** The vDC model is based on hub containing all the common shared services, requested to the spokes. Two hubs should offer the same set of services and for functional prospective, there is no effective benefit to interconnect hubs.
 - **interconnection between spokes** (residents in the same hub or different hubs). Inside a single spoke is possible to implement complex multi-tiers workloads. Multi-tier configurations can be implemented using subnets (one for every tier) in the same VNet and filtering the flows by NSGs. A typical example is the case where multiple application servers deployed (under the responsibility of developer team) are in a spoke while the  database is deployed in a different spoke. In this case it is easy interconnect the spokes to avoid transit in the hub.
 
-		fig.7: spoke-to-spoke
+[![3]][3]
 
 One further point of discussion is the possibility to create spokes interconnected to a spoke that works itself as hub. From topology prospective, the approach increases the level of hierarchy hub-spokes topology as two levels: in this case the spoke in higher level of hierarchy (level 0) become the hub of lower spokes (level 1) of the hierarchy.
-
-		fig.8:  vDC topology with two levels 
-
-Azure offers the possibility to implement complex topologies, but one of principle of vDC is repeatability and simplicity to minimize the management effort; the simple hub-spokes remains at most the vDC reference architecture. 
+The spoke of vDC need to forward the traffic to the central hub to reach out in some cases the on-premises network and internet. An architecture with two level of hub-spoke introduce  complex routing that vanish the benefit of simplicity. Azure offers the possibility to implement complex topologies, but one of principle of vDC is repeatability and simplicity to minimize the management effort; the simple hub-spokes remains at most the vDC reference architecture. 
 
 An vDC architecture can be built properly with resiliency, by duplications and load balancing of the different Azure components, but nevertheless it is not resilient major disaster of Azure region; high resilient services can be created only through multiple vDCs deployed in different Azure regions. 
 
@@ -139,15 +151,15 @@ The diagram shows different roles for different groups:
 - the *dev & test (devops) group* have the responsibility to deploy workloads; this group requires at least the role of Virtual Machine Contributor for IaaS deployment and/or one or more PaaS contributors roles (see [https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/](https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/ "RBAC: Built-in roles") ). Optionally the dev& test team need to get visibility on security policies (NSGs) and routing policies (UDR) inside a specific spoke; in this case further to the roles of contributor for workloads, it gets the role of Network Reader.
 - *operation and maintenance group* have the responsibility of production; the group needs to be a subscription contributor on workloads in production subscription. To fix potentially misconfiguration and issue with production, the company might evaluate if assign to an escalation support team group the role of subscription contributor in production and in the central hub subscription.
     
-One of interesting point to create the structure of the vDC is the Line of  Businesses (LOBs). Enterprises need need to understand how to bind the different company projects to the Azure subscriptions.
+One of interesting point to create the structure of the vDC is the Line of  Businesses (LOBs). Enterprises need to understand how to distribute the different company projects to the Azure subscriptions.
 
 		fig11: Users, groups, subscriptions and LOB 
 
-The diagram reports the concept of users, group of user with specific role assignment to access to the Azure resource in the different deployment. Organization can make leverage on unique Azure AD tenant or multiple tenants; the diagram report the case where one tenant is used only for production deployments of different LOBs. The utilization of two Azure AD tenants enforce the separation between devops and production. 
+The diagram reports the concept of users, group of user with specific role assignment to access to the Azure resource in the different deployments. Organization can make leverage on unique Azure AD tenant or multiple tenants; the diagram shows the case where one tenant is used only for production deployments of different LOBs. The utilization of two Azure AD tenants enforce the separation between devops & UAT and production. 
 
 There are some simple cases can be considered to understand the implications:
 
-- every environment (e.g. devops) can share the same Azure subscription between different LOBs. The scenario works well in the case the same teams work on all LOBs. The benefit of this approach is to use a low number of Azure subscriptions but with presence multiple deployments of different LOB in the same subscription. The disadvantage of this approach is the presence of multiple deployments in the same subscription and large numbers of Resource Groups with consequent high probability to make accidental actions in wrong deployment. 
+- every environment (e.g. devops) can share the same Azure subscription between different LOBs. The scenario works well in the case the same teams work on all LOBs. The benefit of this approach is to use a low number of Azure subscriptions but with presence multiple deployments of different LOB in the same subscription. The drawback of this approach is the presence of multiple deployments in the same subscription and large numbers of Resource Groups with consequent high probability to make accidental actions in wrong deployment. 
 - every LOB have different teams. In this case the best option is to create an Azure subscription for every environment (devops, UAT, PROD). This approach have strong separation of environments and LOBs, but it potentially prone to an excess of proliferation of subscriptions in vDC. (e.g. with with 30 LOBs, each with three different environments, requires 90 subscriptions).
 - more common scenario is where Central IT and PROD group are the same for every LOB and devops is arranged in sub-teams based on type of workload. In this case some Azure subscriptions can be shared across a list of LOBs.
 
@@ -317,8 +329,11 @@ Most of LOBs in production require service with high SLA to have the minim impac
 
 
 <!--Image References-->
-[0]: ./media/best-practice-vdc/redundant-equipment.png "Example of component overlap"
+[0]: ./media/best-practice-vdc/redundant-equipment.png "Example of component overlap" 
 [1]: ./media/best-practice-vdc/vdc-high-level.png "High level example of hub and spoke vDC"
+[2]: ./media/best-practice-vdc/hub-spokes-cluster.png "cluster of hub and spoke"
+[3]: ./media/best-practice-vdc/spoke-to-spoke.png "spoke-to-spoke"
+
 
 <!--Link References-->
 [Example1]: ./virtual-network/Network-Boundary-DMZ-NSG-ASM1.md
