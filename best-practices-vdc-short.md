@@ -208,15 +208,18 @@ The diagram enforce two perimeters with internet and on-premises network, both r
 In a single hub, the perimeter network to internet scales up to large number of LOBs, using multiple farm of WAFs and/or firewalls.
 
 **Virtual Networks**
+
 The hub is typically build on a VNet with multiple subnets, to host the different type of services to filter and inspect the traffic from/to internet via NVAs, WAFs, Azure Application Gateways. 
 
-**UDR**
+**UDR** 
+
 By UDR customers can deploy a firewall, IDS/IPS, and other virtual appliances, and route network traffic through these security appliances for security boundary policy enforcement, auditing, and inspection. UDRs can set in the hub and in the spokes to guarantee that traffics transit through specific custom VMs, Network Virtual Appliances and load balancers. To guarantee that traffic generated from the VMs resident in the spoke transit in the Virtual appliances, a UDR needs to be set in the subnets of the spoke by setting as next-hop the front-end IP address of the internal load balancer, that distribute the internal traffic to the Virtual Appliances (load balancer back-end pool).
 
 [![8]][8]
 
 
 **Network Virtual Appliances**
+
 In the hub the perimeter network with internet is normally enforced through a farm of firewalls and/or Web Application Firewalls (WAFs). 
 In the LOBs there is a predominant existence of web applications, which tends to be affected by a lot of different types of vulnerabilities and exploits. Web Applications Firewalls are a special breed of product used to detect attacks against web applications (HTTP/HTTPS) in more depth than generic firewall. Compare with tradition firewall technology, WAFs have a set of specific features to protect internal web servers from threats. 
 A firewall farm is group of firewalls working in tandem under the same common administration, with a set of security rule to protect the workloads in the spokes and guarantee the right control of access to on-premises networks. A firewall farm have less specialized software compare with WAF, but has a broad application scope to filter and inspect any type of traffic in egress and ingress. Firewall farm are normally implemented in azure through Network Virtual Appliances (NVAs) available in Azure marketplace offering.
@@ -225,12 +228,14 @@ As good practice is recommended to use one set of NVAs for traffic originating o
 Most of large enterprise manage multiple domains; the Azure DNS can be used to host the DNS records for a particular domain. As example, the Virtual IP Address (VIP) of the Azure external load balancer (or the WAFs) can be registered in the A record of Azure DNS. 	
 
 **Azure Load Balancer**
+
 Azure load balancer offers an high availability Layer 4 (TCP,UDP) service to distribute incoming traffic among instances of services defined in a load-balanced set, based on different type of algorithms.
 The traffic incoming in the load balancer from front end endpoints (public IP endpoints or private IP endpoints) can be redistributed with or without address translation to a set of back-end IP address pool (e.g Network Virtual appliances or VMs).
 Azure Load Balancer can probe the health of the various server instances. When a probe fails to respond, the load balancer stops sending new connections to the unhealthy instances. In the vDC we have the presence of external load balancer in hub, for example to balance the traffic to NVAs, or in the spokes to balance the traffic between different VMs of multitier application.
 
 
 **Public IPs**
+
 Some Azure features enable to associated via service endpoints a public IP address that allows to your resource to be routed to internet.
 The endpoint uses Network Address Translation (NAT) to route traffic to the internal address and port on the Azure virtual network. This path is the primary way for external traffic to pass into the virtual network. The Public IP addresses are configurable to determine which traffic is passed in, and how and where it's translated on to the virtual network.
 Most of large enterprise manage multiple domains; the Azure DNS can be used to host the DNS records for a particular domain. As example, the Virtual IP Address (VIP) of the Azure external load balancer (or the WAFs) can be registered in the A record of Azure DNS. 	
@@ -270,6 +275,7 @@ Feature list included in workloads:
 - Events and Messaging
 
 **Internal LOB Applications**
+
 A line of business application is one of set of critical computer application that are vital to running an enterprise. LOB application have some characteristics:
 - *interactive*. LOB applications are interactive by nature: data is entered and result/reports are returned.
 - *data driven*. LOB application are data intensive with frequent access to the database
@@ -280,15 +286,18 @@ Nevertheless a quite lot of applications in the datacenter, especially legacy ap
 In the case customer own the code of the  applications, it can be done a porting to Azure with an architecture that stores the status of the application for example via a resilient messaging system. A typical example to adapt an existing application to the cloud is through a event/message system accessible by multiple application instances to implement a logic with producer(s)/consumer(s) of messages.
 
 **Customer facing web sites**
+
 Most of interaction with internet happen via web sites.
 The vDC offers the capability to run web site in IaaS VMs or in Azure Web Apps (PaaS).
 Azure Web Apps support the integration with VNets that allow to specific department to deploy the Web Apps in a spoke of vDC. A common scenario where you would use VNET Integration is enabling access from your web app to a database or a web services running on a virtual machine in your Azure virtual network. With VNET Integration you don't need to expose a public endpoint for applications on your VM but can use the private non-internet routable addresses instead.
 
 **Big Data/Analytics**
-when data need to scale up lo large volume, database do not scale up properly and Hadoop technology offer a system to run distribute queries in parallel on large number of nodes. Customer have the option to run build data workload in IaaS VMs or PaaS (HDInsight).
+
+When data need to scale up lo large volume, database do not scale up properly and Hadoop technology offer a system to run distribute queries in parallel on large number of nodes. Customer have the option to run build data workload in IaaS VMs or PaaS (HDInsight).
 HDInsight supports deploying into a location-based VNet, that give to possibility to deploy a cluster in the spoke of the vDC. 
 
 **Events and Messaging**
+
 Azure Event Hubs is a hyper-scale telemetry ingestion service that collects, transforms and stores millions of events. 
 As a distributed streaming platform, it offers low latency and configurable time retention, enabling you to ingress massive amounts of telemetry into Azure and to read the data from multiple applications.
 With the Event Hubs a single stream can support both real-time and batch-based pipelines.
