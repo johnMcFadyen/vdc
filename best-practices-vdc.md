@@ -346,7 +346,7 @@ Azure Traffic Manager uses the Domain Name System (DNS) mechanism to direct the 
 
 
 ### Conclusion
-vDc is an approach to the datacenter migration in the cloud with a combination of various features and capabilities to create a scalable architecture in Azure that maximize the cloud resources, reducing the cost and simplifying the governance of the system.  The vDC is based on topology hub-spokes with common shared services resident in the hub and the specific applications/workloads associated with a LOB in a spoke. A vDC match the structure of company roles, where different departments (Central IT, devops, operation and maintenance) work together each with a specific segregation of duty. A vDC satisfy the requirements of "lift and Shit", but also of project that nativity born in the cloud.
+vDc is an approach to the datacenter migration in the cloud with a combination of various features and capabilities to create a scalable architecture in Azure that maximize the cloud resources, reducing the cost and simplifying the governance of the system.  The vDC is based on topology hub-spokes with common shared services resident in the hub and the specific applications/workloads associated with a LOB in a spoke. A vDC match the structure of company roles, where different departments (Central IT, devops, operation and maintenance) work together each with a specific segregation of duty. A vDC satisfy the requirements of "lift and Shift", but also of project that nativity born in the cloud.
  
 
 <!--Image References-->
